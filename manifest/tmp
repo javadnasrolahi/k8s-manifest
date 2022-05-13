@@ -1,0 +1,4 @@
+apk add python3 \
+apk add vim \
+apk add py3-pip \
+pip3 install kafka-python==2.0.2

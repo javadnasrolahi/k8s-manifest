@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: zookeeper
+  name: zookeeper
+spec:
+  serviceName: "zookeeper"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper 
+  template:
+    metadata:
+      labels:
+        app: zookeeper 
+    spec:
+      containers:
+      - name: zookeeper
+        image: zookeeper
+        ports:
+        - containerPort: 2181
+        
+        # Servers listen on three ports: 2181 for client connections
+        # 2888 for follower connections, if they are the leader
+        # and 3888 for other server connections during the leader election phase .
+        
+        env:
+        - name: ZOOKEEPER_ID
+          value: "1"
+        - name: ZOOKEEPER_SERVER_1
+          value: zoo1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+  labels:
+    app: zookeeper
+spec:  
+  ports:
+  - port: 2181
+    name: client
+  clusterIP: None
+  selector:
+    app: zookeeper
+  clusterIP: None
+  
+ 
+
+  #       volumeMounts:
+  #       - name: elastic-data
+  #         mountPath: /data
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: elastic-data
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     storageClassName: "standard"
+  #     resources:
+  #       requests:
+  #         storage: 10Gi
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: zookeeper-headless
+# spec:
+#   ports:
+#   - port: 2888
+#     name: server
+#   - port: 3888
+#     name: leader-election
+#   clusterIP: None
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: zookeeper-service
+# spec:
+#   ports:
+#   - port: 2181
+#     name: client
+# ---

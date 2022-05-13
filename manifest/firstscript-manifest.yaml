@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: send-epoch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: send-epoch
+  template:
+    metadata:
+      labels:
+        app: send-epoch
+    spec:
+      containers:
+      - name: send-epoch
+        image: sosfullking/send-epoch
+        imagePullPolicy: Always
+        # imagePullPolicy: IfNotPresent

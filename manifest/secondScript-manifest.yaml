@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: convert-epoch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: convert-epoch
+  template:
+    metadata:
+      labels:
+        app: convert-epoch
+    spec:
+      containers:
+      - name: convert-epoch
+        image: sosfullking/convert-epoch
+        # imagePullPolicy: IfNotPresent

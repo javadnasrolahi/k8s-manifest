@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: kafka
+  name: kafka
+spec:
+  serviceName: "kafka"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka 
+    spec:
+      containers:
+      - name: kafka
+        # image: wurstmeister/kafka
+        image: sosfullking/kafka:3
+        ports:
+        - containerPort: 9092
+        - containerPort: 9094
+        - containerPort: 1111
+        # args:
+        #   - "-javaagent:/usr/app/jmx_prometheus_javaagent.jar=9898:/usr/app/prom-jmx-agent-config.yml"
+          
+        env:
+        - name: HOSTNAME_COMMAND
+          value: "echo \"$HOSTNAME.kafka\""
+        - name: BROKER_ID_COMMAND
+          value: "hostname | awk -F'-' '{print $2}'"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zookeeper-service:2181"
+        - name: KAFKA_LISTENERS
+          value: "INSIDE://:9092,OUTSIDE://:9094"
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: "INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: "INSIDE"
+        - name: KAFKA_PORT
+          value: "9092"        
+        - name: KAFKA_CREATE_TOPICS
+          value: "input:1:1"
+        # - name: KAFKA_OPTS
+        #   value: "-javaagent:/usr/app/jmx_prometheus_javaagent.jar=9898:/usr/app/prom-jmx-agent-config.yml"
+        #           -javaagent:/usr/app/jmx_prometheus_javaagent.jar=7071:/usr/app/prom-jmx-agent-config.yml
+        #      java -javaagent:./jmx_prometheus_javaagent-0.16.1.jar=8080:config.yaml -jar yourJar.jar
+        - name: JMX_PORT
+          value: "1111"
+      nodeName: master02-h
+
+      # - name: kafka-exporter
+      #   image: bitnami/kafka-exporter
+      #   command: ["kafka_exporter", "--kafka.server=127.0.0.1:9094"]
+      #   ports:
+      #   - containerPort: 9308
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  ports:
+  - port: 9092
+    targetPort: 9092
+    name: kafka-internal
+  - port: 9094
+    targetPort: 9094
+    name: kafka-external
+  - port: 1111
+    targetPort: 1111
+    name: kafka-exporter
+  selector:
+    app: kafka
+  clusterIP: None
