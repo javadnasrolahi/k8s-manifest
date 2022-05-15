@@ -45,7 +45,7 @@ spec:
   
         # - name: prometheus-storage-volume
         #   emptyDir: {}
-      nodeName: worker01-h
+      # nodeName: worker01-h
 ---
 apiVersion: v1
 kind: Service

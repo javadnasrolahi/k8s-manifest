@@ -7,5 +7,5 @@ RUN apt-get install -y vim
 RUN apt-get install -y curl
 COPY . .
 ENTRYPOINT ["python", "-u"]
-CMD ["sleep.py"]
-# CMD ["send_epoch.py"]
+# CMD ["sleep.py"]
+CMD ["send_epoch.py"]

@@ -51,7 +51,7 @@ spec:
         #      java -javaagent:./jmx_prometheus_javaagent-0.16.1.jar=8080:config.yaml -jar yourJar.jar
         # - name: JMX_PORT
         #   value: "9898"
-      nodeName: master02-h
+      # nodeName: master02-h
 
       # - name: kafka-exporter
       #   image: bitnami/kafka-exporter

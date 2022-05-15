@@ -66,7 +66,7 @@ spec:
       #   - name: grafana-pv
       #     persistentVolumeClaim:
       #       claimName: grafana-pvc
-      nodeName: master02-h
+      # nodeName: master02-h
 ---
 apiVersion: v1
 kind: Service

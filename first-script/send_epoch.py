@@ -1,25 +1,18 @@
+from time import sleep
+import time
+from json import dumps
 from kafka import KafkaProducer
-from requests import get
-import time 
 
-bootstrap_servers = ['kafka-service:9094']
-topicName = 'input'
+producer = KafkaProducer(
+    bootstrap_servers=['kafka:9094'],
+    value_serializer=lambda x: dumps(x).encode('utf-8')
+)
+print('connected')
+
+j = 0 
 while True:
-    try:
-        producer = KafkaProducer(bootstrap_servers = bootstrap_servers,
-                                request_timeout_ms = 1000
-                                )
-        print("connected")
-        break
-    except: 
-        print("send epoch : Kafka isn't available")
-        time.sleep(3)
-        
-
-while True: 
-    print("send epoch timestamp to kafka")
-    print(f"time = time.time()")
-    producer.send(topicName, str(time.time()).encode())
-    producer.flush()
-    print('done')
-    time.sleep(1)
+    print("Iteration", j)
+    data = {'epoch-time': time.time()}
+    producer.send('input', value=data)
+    j += 1
+    sleep(1)

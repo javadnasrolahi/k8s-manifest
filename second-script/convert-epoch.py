@@ -1,23 +1,31 @@
 from kafka import KafkaConsumer
-import time
+from kafka import KafkaProducer
+from json import loads
+from time import sleep
+from json import dumps
+import datetime
 
-bootstrap_servers = ['kafka-service:9094']
+consumer = KafkaConsumer(
+    'input',
+    bootstrap_servers=['kafka:9094'],
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='my-group-id',
+    value_deserializer=lambda x: loads(x.decode('utf-8'))
+)
 
-while True:
-    try:
-        consumer = KafkaConsumer('input',
-                                bootstrap_servers = bootstrap_servers,
-                                auto_offset_reset='earliest',
-                                enable_auto_commit=False,
-                                #metadata_max_age_ms = 2000
-                                )
-        break
-    except : 
-        print("conver epoch : Kafka isn't available")
-        time.sleep(3)
-        
-        
-for message in consumer:
-    print (f"recived from kafka: {message.value}")
+producer = KafkaProducer(
+    bootstrap_servers=['kafka:9094'],
+    value_serializer=lambda x: dumps(x).encode('utf-8')
+)
+print('connected')
 
-consumer.close()
+for event in consumer:
+    event_data = event.value
+    # Do whatever you want
+    print(event_data)
+    data = {'iso-time': datetime.datetime.fromtimestamp(event_data['epoch-time']).isoformat()}
+    print(data)
+    producer.send('output', value=data)
+    print("#################")
+    
