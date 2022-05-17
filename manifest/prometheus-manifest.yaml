@@ -22,7 +22,7 @@ spec:
           args:
             - "--storage.tsdb.retention.time=12h"
             - "--config.file=/etc/prometheus/prometheus.yml"
-            # - "--storage.tsdb.path=/prometheus/"
+            - "--storage.tsdb.path=/prometheus/"
           ports:
             - containerPort: 9090
           # resources:
@@ -36,16 +36,26 @@ spec:
             - name: prometheus-config-volume
               mountPath: /etc/prometheus/
             # - name: prometheus-storage-volume
-            #   mountPath: /prometheus/
+            - name: prom-claim
+              mountPath: /prometheus/
       volumes:
         - name: prometheus-config-volume
           configMap:
-            # defaultMode: 420
             name: prometheus-cm
+
+      nodeName: worker01-s
+  volumeClaimTemplates:
+    - metadata:
+        name: prom-claim
+      spec:
+        volumeName: prom-pv
+        storageClassName: local-storage
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi 
   
-        # - name: prometheus-storage-volume
-        #   emptyDir: {}
-      # nodeName: worker01-h
 ---
 apiVersion: v1
 kind: Service
@@ -64,4 +74,16 @@ spec:
 
 # type: NodePort
 # nodePort: 30001
-
+# --- 
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: prom-claim
+# spec: 
+#   volumeName: example-pv
+#   storageClassName: local-storage
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests: 
+#       storage: 2Gi
